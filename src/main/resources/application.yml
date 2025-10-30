@@ -1,0 +1,20 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    properties:
+      hibernate.format_sql: true
+      hibernate.show_sql: false
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expirationMinutes: ${JWT_EXPIRATION_MINUTES}
