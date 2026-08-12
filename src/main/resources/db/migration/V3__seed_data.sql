@@ -1,5 +1,5 @@
 -- === USERS DE PRUEBA ===
-insert into users (first_name, last_name, email, password, role, active, created_at)
+insert into users (first_name, last_name, email, password, role, enabled, created_at)
 values
     ('Admin', 'User', 'admin@test.com',
      '$2a$10$O7Qk0TadE7gmLwZkBv06.eiIxv06hwkpi6Ac.WiEYqaHnSgq5rKHu', -- password: admin123

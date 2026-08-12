@@ -1,5 +1,6 @@
 package com.afriasdev.dds.api.dto.request;
 
+import com.afriasdev.dds.validation.ValidBloodType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -7,12 +8,14 @@ import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 public record CreateRequestDto(
-    @NotBlank
-    String bloodType,
-    @Min(1)
-    @Max(3)
-    Short urgency,
-    String hospital,
-    BigDecimal latitude,
-    BigDecimal longitude
-) { }
+        @NotBlank
+        @ValidBloodType
+        String bloodType,
+        @Min(1)
+        @Max(3)
+        Short urgency,
+        String hospital,
+        BigDecimal latitude,
+        BigDecimal longitude
+) {
+}

@@ -2,7 +2,8 @@ package com.afriasdev.dds.api;
 
 import com.afriasdev.dds.api.dto.notification.CreateNotificationDto;
 import com.afriasdev.dds.api.dto.notification.MarkSeenDto;
-import com.afriasdev.dds.domain.Notification;
+import com.afriasdev.dds.api.dto.notification.NotificationResponseDto;
+import com.afriasdev.dds.api.mapper.EntityMapper;
 import com.afriasdev.dds.service.AuthUserService;
 import com.afriasdev.dds.service.NotificationService;
 import jakarta.validation.Valid;
@@ -18,27 +19,36 @@ public class NotificationController {
 
     private final NotificationService service;
     private final AuthUserService authUser;
+    private final EntityMapper mapper;
 
-    public NotificationController(NotificationService service, AuthUserService authUser) {
+    public NotificationController(NotificationService service, AuthUserService authUser, EntityMapper mapper) {
         this.service = service;
         this.authUser = authUser;
+        this.mapper = mapper;
     }
 
     @GetMapping("/me")
-    public List<Notification> myNotifications(Authentication auth) {
+    public List<NotificationResponseDto> myNotifications(Authentication auth) {
         var user = authUser.currentUser(auth);
-        return service.myNotifications(user.getId());
+        return service.myNotifications(user.getId()).stream()
+                .map(mapper::toNotificationResponse)
+                .toList();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Notification create(@Valid @RequestBody CreateNotificationDto dto) {
-        return service.create(dto);
+    public NotificationResponseDto create(@Valid @RequestBody CreateNotificationDto dto) {
+        return mapper.toNotificationResponse(service.create(dto));
     }
 
     @PatchMapping("/{id}/seen")
-    public Notification markSeen(@PathVariable Long id, @RequestBody MarkSeenDto dto, Authentication auth) {
+    public NotificationResponseDto markSeen(
+            @PathVariable Long id,
+            @Valid @RequestBody MarkSeenDto dto,
+            Authentication auth
+    ) {
+        var user = authUser.currentUser(auth);
         boolean seen = dto.seen() != null && dto.seen();
-        return service.markSeen(id, seen);
+        return mapper.toNotificationResponse(service.markSeen(id, user.getId(), seen));
     }
 }
