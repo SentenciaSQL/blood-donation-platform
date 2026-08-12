@@ -4,9 +4,7 @@ import com.afriasdev.dds.api.dto.error.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,12 +31,9 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI());
     }
 
-    @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
-    public ResponseEntity<ApiError> handleForbidden(RuntimeException ex, HttpServletRequest request) {
-        String message = ex.getMessage() == null || ex.getMessage().isBlank()
-                ? "Access denied"
-                : ex.getMessage();
-        return build(HttpStatus.FORBIDDEN, message, request.getRequestURI());
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(ConflictException.class)
@@ -46,8 +41,8 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
-    @ExceptionHandler({BadCredentialsException.class, AuthenticationException.class})
-    public ResponseEntity<ApiError> handleAuth(AuthenticationException ex, HttpServletRequest request) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiError> handleAuth(BadCredentialsException ex, HttpServletRequest request) {
         return build(HttpStatus.UNAUTHORIZED, "Invalid credentials", request.getRequestURI());
     }
 
