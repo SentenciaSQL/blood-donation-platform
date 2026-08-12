@@ -14,6 +14,11 @@ spring:
       hibernate.show_sql: false
   flyway:
     enabled: ${SPRING_FLYWAY_ENABLED}
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: false
 
 jwt:
   secret: ${JWT_SECRET}
@@ -26,3 +31,8 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
+
+# DevTools restarts briefly re-evaluate security auto-config; suppress the noisy delta report.
+logging:
+  level:
+    org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener: OFF
