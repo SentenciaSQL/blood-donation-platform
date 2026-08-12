@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Nested inventory endpoints kept for backward compatibility.
+ */
 @RestController
 @RequestMapping("/blood-banks/{bankId}/inventory")
 public class InventoryController {

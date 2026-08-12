@@ -7,9 +7,13 @@ public record BloodBankResponseDto(
         Long id,
         String name,
         String address,
+        String city,
         String phone,
+        String email,
         BigDecimal latitude,
         BigDecimal longitude,
-        Instant createdAt
+        Boolean active,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }
