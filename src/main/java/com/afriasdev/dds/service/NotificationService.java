@@ -1,7 +1,12 @@
 package com.afriasdev.dds.service;
 
 import com.afriasdev.dds.api.dto.notification.CreateNotificationDto;
+import com.afriasdev.dds.domain.Inventory;
+import com.afriasdev.dds.domain.Donation;
 import com.afriasdev.dds.domain.Notification;
+import com.afriasdev.dds.domain.Request;
+import com.afriasdev.dds.domain.Role;
+import com.afriasdev.dds.domain.User;
 import com.afriasdev.dds.exception.ForbiddenException;
 import com.afriasdev.dds.exception.ResourceNotFoundException;
 import com.afriasdev.dds.repository.NotificationRepository;
@@ -33,10 +38,15 @@ public class NotificationService {
     public Notification create(CreateNotificationDto dto) {
         var user = users.findById(dto.userId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return createForUser(user, dto.title(), dto.body());
+    }
+
+    @Transactional
+    public Notification createForUser(User user, String title, String body) {
         var n = Notification.builder()
                 .user(user)
-                .title(dto.title())
-                .body(dto.body())
+                .title(title)
+                .body(body)
                 .seen(false)
                 .createdAt(Instant.now())
                 .build();
@@ -54,5 +64,54 @@ public class NotificationService {
 
         n.setSeen(seen);
         return n;
+    }
+
+    @Transactional
+    public void notifyDonationConfirmed(Donation donation) {
+        createForUser(
+                donation.getDonor(),
+                "Donation confirmed",
+                "Your donation appointment on " + donation.getAppointmentDate() + " has been confirmed."
+        );
+    }
+
+    @Transactional
+    public void notifyDonationCompleted(Donation donation) {
+        createForUser(
+                donation.getDonor(),
+                "Donation completed",
+                "Thank you! Your donation was completed successfully."
+        );
+    }
+
+    @Transactional
+    public void notifyDonationCancelled(Donation donation) {
+        createForUser(
+                donation.getDonor(),
+                "Donation cancelled",
+                "Your donation appointment on " + donation.getAppointmentDate() + " was cancelled."
+        );
+    }
+
+    @Transactional
+    public void notifyRequestStatusChanged(Request request) {
+        createForUser(
+                request.getRequester(),
+                "Blood request update",
+                "Your blood request status is now " + request.getStatus() + "."
+        );
+    }
+
+    @Transactional
+    public void notifyAdminsLowStock(Inventory inventory) {
+        String bloodType = inventory.getBloodType() == null ? "?" : inventory.getBloodType().getCode();
+        String bankName = inventory.getBloodBank() == null ? "unknown bank" : inventory.getBloodBank().getName();
+        String title = "Low blood stock";
+        String body = "Stock for " + bloodType + " at " + bankName
+                + " is low (" + inventory.getUnitsAvailable() + " units).";
+
+        users.findAll().stream()
+                .filter(u -> u.getRole() == Role.ADMIN && Boolean.TRUE.equals(u.getActive()))
+                .forEach(admin -> createForUser(admin, title, body));
     }
 }

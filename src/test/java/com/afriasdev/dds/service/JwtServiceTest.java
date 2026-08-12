@@ -21,12 +21,17 @@ public class JwtServiceTest {
         var svc = new JwtService();
         ReflectionTestUtils.setField(svc, "secret", "change-me-32chars-minimum-aaaaaaaaaaaa");
         ReflectionTestUtils.setField(svc, "expirationMinutes", 5L);
+        ReflectionTestUtils.setField(svc, "refreshExpirationDays", 7L);
 
-        var token = svc.generate("andres@test.com", java.util.Map.of("role", "ADMIN"));
+        var token = svc.generateAccessToken("andres@test.com", "ADMIN");
         assertThat(token).isNotBlank();
+        assertThat(svc.isAccessToken(token)).isTrue();
 
         var subject = svc.getSubject(token);
         assertThat(subject).isEqualTo("andres@test.com");
+
+        var refresh = svc.generateRefreshToken("andres@test.com");
+        assertThat(svc.isRefreshToken(refresh)).isTrue();
     }
 
 }

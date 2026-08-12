@@ -1,9 +1,10 @@
 package com.afriasdev.dds.api.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import com.afriasdev.dds.domain.RequestStatus;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateRequestStatusDto(
-        @NotBlank
-        String status,
+        @NotNull RequestStatus status,
         Long matchedDonorUserId
-) { }
+) {
+}

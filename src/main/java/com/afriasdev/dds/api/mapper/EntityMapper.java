@@ -42,9 +42,20 @@ public class EntityMapper {
         return new DonorResponseDto(
                 donor.getUserId(),
                 toUserSummary(donor.getUser()),
-                donor.getBloodType(),
-                donor.getLastDonationAt(),
-                donor.getAvailability()
+                donor.getBloodType() == null ? null : donor.getBloodType().getCode(),
+                donor.getBirthDate(),
+                donor.getGender(),
+                donor.getPhone(),
+                donor.getCity(),
+                donor.getAddress(),
+                donor.getLatitude(),
+                donor.getLongitude(),
+                donor.getWeight(),
+                donor.getLastDonationDate(),
+                donor.getEligible(),
+                donor.getActive(),
+                donor.getCreatedAt(),
+                donor.getUpdatedAt()
         );
     }
 
@@ -56,10 +67,14 @@ public class EntityMapper {
                 bank.getId(),
                 bank.getName(),
                 bank.getAddress(),
+                bank.getCity(),
                 bank.getPhone(),
+                bank.getEmail(),
                 bank.getLatitude(),
                 bank.getLongitude(),
-                bank.getCreatedAt()
+                bank.getActive(),
+                bank.getCreatedAt(),
+                bank.getUpdatedAt()
         );
     }
 
@@ -68,11 +83,17 @@ public class EntityMapper {
             return null;
         }
         Long bankId = inventory.getBloodBank() == null ? null : inventory.getBloodBank().getId();
+        String bankName = inventory.getBloodBank() == null ? null : inventory.getBloodBank().getName();
+        int units = inventory.getUnitsAvailable() == null ? 0 : inventory.getUnitsAvailable();
+        int min = inventory.getMinimumStock() == null ? 0 : inventory.getMinimumStock();
         return new InventoryResponseDto(
                 inventory.getId(),
                 bankId,
-                inventory.getBloodType(),
-                inventory.getUnitsAvailable(),
+                bankName,
+                inventory.getBloodType() == null ? null : inventory.getBloodType().getCode(),
+                units,
+                min,
+                units <= min,
                 inventory.getUpdatedAt()
         );
     }
@@ -84,14 +105,19 @@ public class EntityMapper {
         return new RequestResponseDto(
                 request.getId(),
                 toUserSummary(request.getRequester()),
-                request.getBloodType(),
+                request.getBloodType() == null ? null : request.getBloodType().getCode(),
+                request.getUnitsRequired(),
+                request.getHospitalName(),
+                request.getPatientName(),
+                request.getContactPhone(),
+                request.getCity(),
+                request.getDescription(),
                 request.getUrgency(),
-                request.getHospital(),
-                request.getLatitude(),
-                request.getLongitude(),
                 request.getStatus(),
+                request.getRequiredDate(),
                 toUserSummary(request.getMatchedDonor()),
-                request.getCreatedAt()
+                request.getCreatedAt(),
+                request.getUpdatedAt()
         );
     }
 
@@ -105,9 +131,13 @@ public class EntityMapper {
                 toUserSummary(donation.getDonor()),
                 toBloodBankResponse(donation.getBloodBank()),
                 requestId,
-                donation.getScheduledAt(),
+                donation.getAppointmentDate(),
                 donation.getStatus(),
-                donation.getCreatedAt()
+                donation.getBloodType() == null ? null : donation.getBloodType().getCode(),
+                donation.getUnitsCollected(),
+                donation.getNotes(),
+                donation.getCreatedAt(),
+                donation.getUpdatedAt()
         );
     }
 
