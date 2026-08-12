@@ -2,6 +2,7 @@ package com.afriasdev.dds.service;
 
 import com.afriasdev.dds.api.dto.bank.CreateBloodBankDto;
 import com.afriasdev.dds.domain.BloodBank;
+import com.afriasdev.dds.exception.ResourceNotFoundException;
 import com.afriasdev.dds.repository.BloodBankRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +39,15 @@ public class BloodBankService {
 
     @Transactional(readOnly = true)
     public BloodBank findById(Long id) {
-        return banks.findById(id).orElseThrow();
+        return banks.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blood bank not found"));
     }
 
     @Transactional
     public void delete(Long id) {
+        if (!banks.existsById(id)) {
+            throw new ResourceNotFoundException("Blood bank not found");
+        }
         banks.deleteById(id);
     }
 }

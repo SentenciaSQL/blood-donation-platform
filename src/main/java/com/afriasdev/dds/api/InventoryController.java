@@ -1,7 +1,8 @@
 package com.afriasdev.dds.api;
 
+import com.afriasdev.dds.api.dto.inventory.InventoryResponseDto;
 import com.afriasdev.dds.api.dto.inventory.UpdateInventoryDto;
-import com.afriasdev.dds.domain.Inventory;
+import com.afriasdev.dds.api.mapper.EntityMapper;
 import com.afriasdev.dds.service.InventoryService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,19 +15,26 @@ import java.util.List;
 public class InventoryController {
 
     private final InventoryService service;
+    private final EntityMapper mapper;
 
-    public InventoryController(InventoryService service) {
+    public InventoryController(InventoryService service, EntityMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping
-    public List<Inventory> list(@PathVariable Long bankId) {
-        return service.findByBank(bankId);
+    public List<InventoryResponseDto> list(@PathVariable Long bankId) {
+        return service.findByBank(bankId).stream()
+                .map(mapper::toInventoryResponse)
+                .toList();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    public Inventory upsert(@PathVariable Long bankId, @Valid @RequestBody UpdateInventoryDto dto) {
-        return service.upsert(bankId, dto);
+    public InventoryResponseDto upsert(
+            @PathVariable Long bankId,
+            @Valid @RequestBody UpdateInventoryDto dto
+    ) {
+        return mapper.toInventoryResponse(service.upsert(bankId, dto));
     }
 }

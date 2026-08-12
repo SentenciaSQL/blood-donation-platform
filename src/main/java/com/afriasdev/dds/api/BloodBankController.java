@@ -1,7 +1,8 @@
 package com.afriasdev.dds.api;
 
+import com.afriasdev.dds.api.dto.bank.BloodBankResponseDto;
 import com.afriasdev.dds.api.dto.bank.CreateBloodBankDto;
-import com.afriasdev.dds.domain.BloodBank;
+import com.afriasdev.dds.api.mapper.EntityMapper;
 import com.afriasdev.dds.service.BloodBankService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -16,26 +17,32 @@ import java.util.List;
 public class BloodBankController {
 
     private final BloodBankService service;
+    private final EntityMapper mapper;
 
-    public BloodBankController(BloodBankService service) {
+    public BloodBankController(BloodBankService service, EntityMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<BloodBank> create(@Valid @RequestBody CreateBloodBankDto dto) {
+    public ResponseEntity<BloodBankResponseDto> create(@Valid @RequestBody CreateBloodBankDto dto) {
         var saved = service.create(dto);
-        return ResponseEntity.created(URI.create("/blood-banks/" + saved.getId())).body(saved);
+        return ResponseEntity
+                .created(URI.create("/blood-banks/" + saved.getId()))
+                .body(mapper.toBloodBankResponse(saved));
     }
 
     @GetMapping
-    public List<BloodBank> all() {
-        return service.findAll();
+    public List<BloodBankResponseDto> all() {
+        return service.findAll().stream()
+                .map(mapper::toBloodBankResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public BloodBank get(@PathVariable Long id) {
-        return service.findById(id);
+    public BloodBankResponseDto get(@PathVariable Long id) {
+        return mapper.toBloodBankResponse(service.findById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

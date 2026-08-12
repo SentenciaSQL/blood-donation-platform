@@ -2,10 +2,12 @@ package com.afriasdev.dds.service;
 
 import com.afriasdev.dds.api.dto.notification.CreateNotificationDto;
 import com.afriasdev.dds.domain.Notification;
+import com.afriasdev.dds.exception.ForbiddenException;
+import com.afriasdev.dds.exception.ResourceNotFoundException;
 import com.afriasdev.dds.repository.NotificationRepository;
 import com.afriasdev.dds.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,12 +24,15 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<Notification> myNotifications(Long userId) {
-        return notes.findAll().stream().filter(n -> n.getUser().getId().equals(userId)).toList();
+        return notes.findAll().stream()
+                .filter(n -> n.getUser() != null && n.getUser().getId().equals(userId))
+                .toList();
     }
 
     @Transactional
     public Notification create(CreateNotificationDto dto) {
-        var user = users.findById(dto.userId()).orElseThrow();
+        var user = users.findById(dto.userId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         var n = Notification.builder()
                 .user(user)
                 .title(dto.title())
@@ -39,8 +44,14 @@ public class NotificationService {
     }
 
     @Transactional
-    public Notification markSeen(Long id, boolean seen) {
-        var n = notes.findById(id).orElseThrow();
+    public Notification markSeen(Long id, Long currentUserId, boolean seen) {
+        var n = notes.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
+
+        if (n.getUser() == null || !n.getUser().getId().equals(currentUserId)) {
+            throw new ForbiddenException("You cannot modify another user's notification");
+        }
+
         n.setSeen(seen);
         return n;
     }
