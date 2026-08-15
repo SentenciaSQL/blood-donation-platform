@@ -1,0 +1,14 @@
+spring:
+  devtools:
+    restart:
+      enabled: false
+    add-properties: false
+
+server:
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
