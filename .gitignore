@@ -33,3 +33,7 @@ build/
 .vscode/
 
 .env
+.firebaserc
+.firebase/
+frontend/dist/
+*.log

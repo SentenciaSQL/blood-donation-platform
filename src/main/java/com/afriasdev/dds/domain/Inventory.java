@@ -18,16 +18,25 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "blood_bank_id", nullable = false)
     private BloodBank bloodBank;
 
+    @Convert(converter = BloodTypeConverter.class)
     @Column(name = "blood_type", nullable = false, length = 3)
-    private String bloodType;
+    private BloodType bloodType;
 
     @Column(name = "units_available", nullable = false)
     private Integer unitsAvailable = 0;
 
+    @Column(name = "minimum_stock", nullable = false)
+    private Integer minimumStock = 5;
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }

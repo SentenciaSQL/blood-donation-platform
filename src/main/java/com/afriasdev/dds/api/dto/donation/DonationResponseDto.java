@@ -2,6 +2,7 @@ package com.afriasdev.dds.api.dto.donation;
 
 import com.afriasdev.dds.api.dto.bank.BloodBankResponseDto;
 import com.afriasdev.dds.api.dto.user.UserSummaryDto;
+import com.afriasdev.dds.domain.DonationStatus;
 
 import java.time.Instant;
 
@@ -10,8 +11,12 @@ public record DonationResponseDto(
         UserSummaryDto donor,
         BloodBankResponseDto bloodBank,
         Long requestId,
-        Instant scheduledAt,
-        String status,
-        Instant createdAt
+        Instant appointmentDate,
+        DonationStatus status,
+        String bloodType,
+        Integer unitsCollected,
+        String notes,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

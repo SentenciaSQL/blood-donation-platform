@@ -2,6 +2,7 @@ package com.afriasdev.dds.api;
 
 import com.afriasdev.dds.api.dto.AuthRequest;
 import com.afriasdev.dds.api.dto.AuthResponse;
+import com.afriasdev.dds.api.dto.RefreshTokenRequest;
 import com.afriasdev.dds.api.dto.RegisterRequest;
 import com.afriasdev.dds.service.AuthService;
 import jakarta.validation.Valid;
@@ -29,5 +30,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request.getRefreshToken()));
     }
 }

@@ -20,3 +20,4 @@ spring:
 jwt:
   secret: test-secret-key-with-at-least-32-characters
   expirationMinutes: 60
+  refreshExpirationDays: 7
